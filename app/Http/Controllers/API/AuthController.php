@@ -29,17 +29,21 @@ class AuthController extends Controller
 
         if (Auth::attempt($formData)) {
             $access_token = JWT::encode([
-                'nama' => 'Gian Nurwana',
-                'email' => 'gian@gmail.com',
-                'iat' => time(),
-                'exp' => time() + 15 // 15 detik
+                'nama' => Auth::user()->name,
+                'email' => Auth::user()->email,
+                // 'iat' => time(),
+                // 'exp' => time() + 15 // 15 detik
+                'iat' => now(),
+                'exp' => now()->addSeconds(15),
             ], env('APP_ACCESS_TOKEN'), 'HS256');
 
             $refresh_token = JWT::encode([
-                'nama' => 'Gian Nurwana',
-                'email' => 'gian@gmail.com',
-                'iat' => time(),
-                'exp' => time() + 20 // 20 detik
+                'nama' => Auth::user()->name,
+                'email' => Auth::user()->email,
+                // 'iat' => time(),
+                // 'exp' => time() + 60 * 60 * 24 // 20 detik
+                'iat' => now(),
+                'exp' => now()->addDays(1),
             ], env('APP_REFRESH_TOKEN'), 'HS256');
 
             setcookie('refreshToken', $refresh_token, time() + 20, '', '', false, true);
