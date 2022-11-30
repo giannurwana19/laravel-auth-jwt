@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -21,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+
+Route::post('auth/login', [AuthController::class, 'login']);
+Route::post('auth/logout', [AuthController::class, 'logout']);
 
 Route::get('get-token', function () {
     $access_token = JWT::encode([
