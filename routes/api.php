@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\User;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,12 +26,14 @@ Route::get('get-token', function () {
     $access_token = JWT::encode([
         'nama' => 'Gian Nurwana',
         'email' => 'gian@gmail.com',
+        'iat' => time(),
         'exp' => time() + 15 // 15 detik
     ], env('APP_ACCESS_TOKEN'), 'HS256');
 
     $refresh_token = JWT::encode([
         'nama' => 'Gian Nurwana',
         'email' => 'gian@gmail.com',
+        'iat' => time(),
         'exp' => time() + 20 // 20 detik
     ], env('APP_REFRESH_TOKEN'), 'HS256');
 
@@ -39,3 +43,12 @@ Route::get('get-token', function () {
         'access_token' => $access_token
     ]);
 });
+
+Route::get('cek-token', function () {
+    $user = User::first();
+
+    return response()->json([
+        'success' => true,
+        'data' => $user
+    ]);
+})->middleware('verifyTokenJWT');
