@@ -41,7 +41,7 @@ class AuthController extends Controller
                 'nama' => Auth::user()->name,
                 'email' => Auth::user()->email,
                 'iat' => time(),
-                'exp' => time() + 60 * 60 * 24 // 20 detik
+                'exp' => time() + 60 * 60 * 24 // 1 hari
             ], env('APP_REFRESH_TOKEN'), 'HS256');
 
             setcookie('refreshToken', $refreshToken, time() + 60 * 60 * 24, '', '', false, true);
