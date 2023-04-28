@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Error;
 use Exception;
 use Facade\FlareClient\Http\Response;
 use Firebase\JWT\JWT;
@@ -20,22 +21,17 @@ class VerifyJWTToken
      */
     public function handle(Request $request, Closure $next)
     {
-        $accessToken = explode(' ', $request->header('Authorization'))[1];
-
         try {
-            $decoded = JWT::decode($accessToken, new Key(env('APP_ACCESS_TOKEN'), 'HS256'));
+            $token = $request->bearerToken();
+            $decoded = JWT::decode($token, new Key(env('APP_ACCESS_TOKEN'), 'HS256'));;
+            $request->user = $decoded->nama;
 
-            request()->username = $decoded->nama;
-
-            return next($request);
-        } catch (Exception $th) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $th->getMessage()
-                ],
-                403
-            );
+            return $next($request);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 401);
         }
     }
 }

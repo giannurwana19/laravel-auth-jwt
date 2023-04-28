@@ -48,11 +48,23 @@ Route::get('get-token', function () {
     ]);
 });
 
-Route::get('cek-token', function () {
-    $user = User::first();
+Route::get('cek-token', function (Request $request) {
+    try {
+        $accessToken = $request->bearerToken();
+        $decodedUser = JWT::decode($accessToken, new Key(env('APP_ACCESS_TOKEN'), 'HS256'));
+        $user = User::find($decodedUser->id);
 
-    return response()->json([
-        'success' => true,
-        'data' => $user
-    ]);
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    } catch (Exception $th) {
+        return response()->json(
+            [
+                'success' => false,
+                'message' => $th->getMessage()
+            ],
+            403
+        );
+    }
 })->middleware('verifyTokenJWT');

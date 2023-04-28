@@ -28,30 +28,29 @@ class AuthController extends Controller
         $formData = $validator->validated();
 
         if (Auth::attempt($formData)) {
-            $access_token = JWT::encode([
+            $accessToken = JWT::encode([
+                'id' => Auth::id(),
                 'nama' => Auth::user()->name,
                 'email' => Auth::user()->email,
-                // 'iat' => time(),
-                // 'exp' => time() + 15 // 15 detik
-                'iat' => now(),
-                'exp' => now()->addSeconds(15),
+                'iat' => time(),
+                'exp' => time() + 15 // 15 detik
             ], env('APP_ACCESS_TOKEN'), 'HS256');
 
-            $refresh_token = JWT::encode([
+            $refreshToken = JWT::encode([
+                'id' => Auth::id(),
                 'nama' => Auth::user()->name,
                 'email' => Auth::user()->email,
-                // 'iat' => time(),
-                // 'exp' => time() + 60 * 60 * 24 // 20 detik
-                'iat' => now(),
-                'exp' => now()->addDays(1),
+                'iat' => time(),
+                'exp' => time() + 60 * 60 * 24 // 20 detik
             ], env('APP_REFRESH_TOKEN'), 'HS256');
 
-            setcookie('refreshToken', $refresh_token, time() + 20, '', '', false, true);
+            setcookie('refreshToken', $refreshToken, time() + 60 * 60 * 24, '', '', false, true);
 
             return response()->json([
                 'success' => true,
                 'user' => Auth::user(),
-                'access_token' => $access_token
+                'access_token' => $accessToken,
+                'refreshToken' => $refreshToken
             ]);
         }
 
